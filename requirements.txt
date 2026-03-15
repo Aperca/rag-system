@@ -105,6 +105,7 @@ fqdn==1.5.1
 frozendict @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_8b0cest_id/croot/frozendict_1713194839836/work
 frozenlist @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/frozenlist_1699254257028/work
 fsspec @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_436le7786l/croot/fsspec_1724855598709/work
+ftfy==6.3.1
 gensim @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_5cdoei19at/croot/gensim_1725057952958/work
 gitdb @ file:///tmp/build/80754af9/gitdb_1617117951232/work
 GitPython @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_ebpnpowk3c/croot/gitpython_1720455037823/work
@@ -228,6 +229,7 @@ numexpr @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/numexp
 numpy==1.26.4
 numpydoc @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_69xghc3i3n/croot/numpydoc_1718279166747/work
 oauthlib==3.3.1
+open_clip_torch==3.3.0
 openai==2.26.0
 openpyxl @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_96hhik4ygv/croot/openpyxl_1721752931204/work
 orjson==3.11.7
@@ -387,6 +389,7 @@ textdistance @ file:///tmp/build/80754af9/textdistance_1612461398012/work
 threadpoolctl @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_efa5bvb6vi/croot/threadpoolctl_1719407806403/work
 three-merge @ file:///tmp/build/80754af9/three-merge_1607553261110/work
 tifffile @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/tifffile_1699243525693/work
+timm==1.0.25
 tinycss2 @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/tinycss2_1699250325251/work
 tldextract @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_86f1bw02kg/croot/tldextract_1723064389239/work
 tokenizers==0.22.1
@@ -394,7 +397,8 @@ toml @ file:///tmp/build/80754af9/toml_1616166611790/work
 tomli @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/tomli_1699237289925/work
 tomlkit @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/tomlkit_1699238737474/work
 toolz @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/toolz_1699238160466/work
-torch==2.9.1
+torch==2.10.0
+torchvision==0.25.0
 tornado @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a4w03z48br/croot/tornado_1718740114858/work
 tqdm @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_24zjwympsr/croot/tqdm_1724853942429/work
 traitlets @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_500m2_1wyk/croot/traitlets_1718227071952/work
