@@ -1,8 +1,12 @@
 from ingestion.loader import load_documents
+from ingestion.chunker import chunk_documents
+
 
 docs = load_documents()
 
-for doc in docs:
-    print(doc["source"])
-    print(doc["text"])
-    print("----")
+chunks = chunk_documents(docs)
+
+for chunk in chunks:
+    print(chunk["text"])
+    print("SOURCE:", chunk["source"])
+    print("-----")
