@@ -14,4 +14,4 @@ def load_clip_model():
 
     model = model.to(device)
 
-    return model, preprocess
+    return model, preprocess, device

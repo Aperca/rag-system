@@ -9,7 +9,7 @@ from models.embedding_model import load_clip_model
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-model, preprocess = load_clip_model()
+model, preprocess, device = load_clip_model()
 
 client = chromadb.PersistentClient(path="vector_store")
 collection = client.get_or_create_collection("research_knowledge_base")
