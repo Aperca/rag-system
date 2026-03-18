@@ -2,7 +2,9 @@
 
 import open_clip
 import torch
+import streamlit as st 
 
+@st.cache_resource
 def load_clip_model():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
