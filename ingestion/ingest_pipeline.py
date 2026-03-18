@@ -1,47 +1,43 @@
+# ingestion/ingest_pipeline.py
+
 import chromadb
+from chromadb.config import Settings
 
 from ingestion.loader import load_documents
 from ingestion.chunker import chunk_documents
-from ingestion.embedder import embed_text_chunks, embed_images
+from ingestion.embedder import embed_text_chunks
 
 
 def run_ingestion():
 
     print("Starting ingestion pipeline...")
 
-    # Load documents
-    documents = load_documents()
+    # load documents
+    docs = load_documents()
 
-    # Chunk documents
-    chunks = chunk_documents(documents)
+    # chunk them
+    chunks = chunk_documents(docs)
 
-    # Create text embeddings
-    text_embeddings = embed_text_chunks(chunks)
+    # create embeddings
+    embeddings = embed_text_chunks(chunks)
 
-    # Create image embeddings
-    image_embeddings = embed_images()
+    print("Total embeddings:", len(embeddings))
 
-    # Combine them
-    all_embeddings = text_embeddings + image_embeddings
+    # connect to vector DB
 
-    print("Total embeddings:", len(all_embeddings))
+    client = chromadb.PersistentClient(path="vector_store")
+    collection = client.get_or_create_collection(
+        name="research_knowledge_base"
+    )
 
-    # Initialize Chroma client
-    client = chromadb.Client()
-
-    collection = client.get_or_create_collection(name="research_knowledge_base")
-
-    # Store embeddings
-    for idx, item in enumerate(all_embeddings):
-
+    # store embeddings
+    for i, item in enumerate(embeddings):
         collection.add(
-            embeddings=[item["embedding"].tolist()],
-            ids=[str(idx)],
-            metadatas=[{
-                "source": item["source"],
-                "type": item["type"]
-            }],
-            documents=[item.get("text", "image")]
+            ids=[str(i)],
+            embeddings=[item["embedding"]],
+            documents=[item["text"]],
+            metadatas=[{"source": item["source"], "type": item["type"]}],
         )
 
+    print("Collection count:", collection.count())
     print("Ingestion complete.")

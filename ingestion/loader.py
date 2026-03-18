@@ -1,23 +1,19 @@
-from pathlib import Path
+# ingestion/loader.py
+import os
 
+DATA_DIR = "data/sample_docs"
 
-def load_documents(data_path="data/sample_docs"):
+def load_documents():
     """
-    Load text documents from the data directory.
-    Returns a list of dictionaries containing text and metadata.
+    Load all text files from data/sample_docs
     """
-
     documents = []
-
-    data_dir = Path(data_path)
-
-    for file_path in data_dir.glob("*.txt"):
-        with open(file_path, "r", encoding="utf-8") as f:
-            text = f.read()
-
-        documents.append({
-            "text": text,
-            "source": str(file_path)
-        })
-
+    for fname in os.listdir(DATA_DIR):
+        if fname.endswith(".txt"):
+            path = os.path.join(DATA_DIR, fname)
+            with open(path, "r", encoding="utf-8") as f:
+                text = f.read().strip()
+                if text:
+                    documents.append({"text": text, "source": fname})
+    print("Documents loaded:", documents)
     return documents

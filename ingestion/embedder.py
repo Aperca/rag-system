@@ -1,62 +1,39 @@
-from PIL import Image
-import torch
-from pathlib import Path
+# ingestion/embedder.py
 
+import numpy as np
+import torch
+import open_clip
 from models.embedding_model import load_clip_model
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-model, preprocess, tokenizer = load_clip_model()
+model, preprocess = load_clip_model()
 
 
 def embed_text_chunks(chunks):
-    """
-    Convert text chunks into CLIP embeddings
-    """
+    embeddings = []
 
-    texts = [chunk["text"] for chunk in chunks]
+    for idx, text in enumerate(chunks):
 
-    tokens = tokenizer(texts)
+        # ✅ correct OpenCLIP tokenization
+        tokens = open_clip.tokenize([text]).to(device)
 
-    with torch.no_grad():
-        text_features = model.encode_text(tokens)
+        with torch.no_grad():
+            emb = model.encode_text(tokens)
 
-    embeddings = text_features.cpu().numpy()
+        emb = emb.cpu().numpy()[0]
+        emb = emb / np.linalg.norm(emb)
 
-    embedded_docs = []
-
-    for chunk, emb in zip(chunks, embeddings):
-        embedded_docs.append({
-            "embedding": emb,
-            "text": chunk["text"],
-            "source": chunk["source"],
+        embeddings.append({
+            "embedding": emb.tolist(),
+            "text": text,
+            "source": f"chunk_{idx}.txt",
             "type": "text"
         })
 
-    return embedded_docs
+    print("Embeddings created:", len(embeddings))
+    return embeddings
 
 
-def embed_images(image_folder="data/images"):
-    """
-    Convert images into CLIP embeddings
-    """
-
-    image_embeddings = []
-
-    image_dir = Path(image_folder)
-
-    for img_path in image_dir.glob("*"):
-
-        image = preprocess(Image.open(img_path)).unsqueeze(0)
-
-        with torch.no_grad():
-            image_features = model.encode_image(image)
-
-        embedding = image_features.cpu().numpy()[0]
-
-        image_embeddings.append({
-            "embedding": embedding,
-            "source": str(img_path),
-            "type": "image"
-        })
-
-    return image_embeddings
+def embed_images():
+    return []

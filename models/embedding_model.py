@@ -1,16 +1,17 @@
-import open_clip
+# models/embedding_model.py
 
+import open_clip
+import torch
 
 def load_clip_model():
-    """
-    Load CLIP model for multimodal embeddings
-    """
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model, _, preprocess = open_clip.create_model_and_transforms(
         "ViT-B-32",
         pretrained="openai"
     )
 
-    tokenizer = open_clip.get_tokenizer("ViT-B-32")
+    model = model.to(device)
 
-    return model, preprocess, tokenizer
+    return model, preprocess
