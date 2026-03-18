@@ -14,7 +14,6 @@ model, preprocess, device = load_clip_model()
 client = chromadb.PersistentClient(path="vector_store")
 collection = client.get_or_create_collection("research_knowledge_base")
 
-
 def retrieve(query, top_k=3):
 
     # tokenize query correctly

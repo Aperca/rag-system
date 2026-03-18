@@ -1,8 +1,9 @@
 # models/embedding_model.py
 
-import open_clip
-import torch
 import streamlit as st 
+import open_clip
+
+import torch
 
 @st.cache_resource
 def load_clip_model():
