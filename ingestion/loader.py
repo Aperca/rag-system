@@ -1,29 +1,23 @@
-import os
-from pypdf import PdfReader
+# ingestion/loader.py
+from typing import List
+from langchain_core.documents import Document
+from PIL import Image
+import io
 
-def load_documents_from_files(files):
+def load_documents_from_files(files: List):
+    """
+    Accepts a list of uploaded files (text or images) and returns a list of Documents.
+    """
     documents = []
-
     for file in files:
         filename = file.name
-
-        # TXT FILES
+        content = file.read()
         if filename.endswith(".txt"):
-            text = file.read().decode("utf-8")
-
-        # PDF FILES
-        elif filename.endswith(".pdf"):
-            reader = PdfReader(file)
-            text = ""
-            for page in reader.pages:
-                text += page.extract_text() or ""
-
+            text = content.decode("utf-8")
+            documents.append({"text": text, "source": filename, "type": "text"})
+        elif filename.lower().endswith((".png", ".jpg", ".jpeg")):
+            img = Image.open(io.BytesIO(content)).convert("RGB")
+            documents.append({"image": img, "source": filename, "type": "image"})
         else:
-            continue
-
-        documents.append({
-            "text": text,
-            "source": filename
-        })
-
+            print(f"Skipping unsupported file type: {filename}")
     return documents
