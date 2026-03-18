@@ -1,19 +1,29 @@
-# ingestion/loader.py
 import os
+from pypdf import PdfReader
 
-DATA_DIR = "data/sample_docs"
-
-def load_documents():
-    """
-    Load all text files from data/sample_docs
-    """
+def load_documents_from_files(files):
     documents = []
-    for fname in os.listdir(DATA_DIR):
-        if fname.endswith(".txt"):
-            path = os.path.join(DATA_DIR, fname)
-            with open(path, "r", encoding="utf-8") as f:
-                text = f.read().strip()
-                if text:
-                    documents.append({"text": text, "source": fname})
-    print("Documents loaded:", documents)
+
+    for file in files:
+        filename = file.name
+
+        # TXT FILES
+        if filename.endswith(".txt"):
+            text = file.read().decode("utf-8")
+
+        # PDF FILES
+        elif filename.endswith(".pdf"):
+            reader = PdfReader(file)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+
+        else:
+            continue
+
+        documents.append({
+            "text": text,
+            "source": filename
+        })
+
     return documents

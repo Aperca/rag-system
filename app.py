@@ -1,44 +1,57 @@
 import streamlit as st
+from ingestion.ingest_pipeline import run_ingestion_from_files
 from retrieval.retriever import retrieve
 from generation.generator import generate_answer
 
 st.set_page_config(page_title="RAG Assistant", layout="wide")
 
 st.title("🧠 RAG Assistant")
-st.write("Ask questions based on your knowledge base")
+st.write("Upload documents and ask questions")
 
 # -------------------------------
-# SESSION STATE (CHAT HISTORY)
+# SESSION STATE
 # -------------------------------
 if "history" not in st.session_state:
     st.session_state.history = []
 
 # -------------------------------
-# INPUT
+# FILE UPLOAD
 # -------------------------------
+st.subheader("📂 Upload Documents")
+
+uploaded_files = st.file_uploader(
+    "Upload TXT or PDF files",
+    type=["txt", "pdf"],
+    accept_multiple_files=True
+)
+
+if st.button("Process Documents"):
+    if uploaded_files:
+        run_ingestion_from_files(uploaded_files)
+        st.success("Documents processed and stored!")
+    else:
+        st.warning("Please upload at least one file.")
+
+# -------------------------------
+# QUESTION INPUT
+# -------------------------------
+st.subheader("❓ Ask Questions")
+
 query = st.text_input("Ask a question:")
 
-# -------------------------------
-# MAIN LOGIC
-# -------------------------------
 if st.button("Submit") and query:
 
-    # Retrieve relevant docs
     results = retrieve(query)
     docs = results["documents"][0]
     metadatas = results["metadatas"][0]
 
-    # -------------------------------
-    # SAFETY: HANDLE NO RESULTS
-    # -------------------------------
     if not docs or docs == ['']:
-        answer = "I don’t have enough information in my knowledge base to answer that."
+        answer = "I don’t have enough information in my knowledge base."
         sources = []
     else:
-        # Generate answer
-        answer = generate_answer(query, docs, st.session_state.history)        sources = [m["source"] for m in metadatas]
+        answer = generate_answer(query, docs, st.session_state.history)
+        sources = [m["source"] for m in metadatas]
 
-    # Save to history
     st.session_state.history.append({
         "question": query,
         "answer": answer,
@@ -46,7 +59,7 @@ if st.button("Submit") and query:
     })
 
 # -------------------------------
-# DISPLAY CHAT HISTORY
+# DISPLAY CHAT
 # -------------------------------
 st.subheader("💬 Chat History")
 
@@ -62,7 +75,7 @@ for chat in reversed(st.session_state.history):
     st.markdown("---")
 
 # -------------------------------
-# CLEAR BUTTON
+# CLEAR
 # -------------------------------
 if st.button("Clear History"):
     st.session_state.history = []
