@@ -28,7 +28,7 @@ def retrieve(query, top_k=3):
 
     results = collection.query(
         query_embeddings=[query_embedding.tolist()],
-        n_results= 2
+        n_results= 5
     )
 
     return results
