@@ -12,7 +12,17 @@ def load_documents_from_files(files: List):
     for file in files:
         filename = file.name
         content = file.read()
-        if filename.endswith(".txt"):
+        if filename.lower().endswith(".pdf"):
+            pdf_reader = pypdf.PdfReader(io.BytesIO(content))
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() + "\n"
+            
+            if text.strip():
+                documents.append({"text": text, "source": filename, "type": "text"})
+            else:
+                print(f"Warning: PDF {filename} appears to be empty or image-only.")
+        elif filename.lower().endswith(".txt"):
             text = content.decode("utf-8")
             documents.append({"text": text, "source": filename, "type": "text"})
         elif filename.lower().endswith((".png", ".jpg", ".jpeg")):
