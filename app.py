@@ -36,8 +36,7 @@ if st.button("Submit") and query:
         sources = []
     else:
         # Generate answer
-        answer = generate_answer(query, docs)
-        sources = [m["source"] for m in metadatas]
+        answer = generate_answer(query, docs, st.session_state.history)        sources = [m["source"] for m in metadatas]
 
     # Save to history
     st.session_state.history.append({
