@@ -88,3 +88,10 @@ for chat in reversed(st.session_state.history):
 if st.button("Clear History"):
     st.session_state.history = []
     st.success("Chat history cleared!")
+
+
+# to see the actual content being fed to the AI
+with st.expander("🔍 Raw Context (What the AI sees)"):
+    for i, content in enumerate(docs):
+        st.write(f"**Chunk {i+1}:**")
+        st.code(content)
