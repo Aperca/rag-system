@@ -4,7 +4,7 @@ from ingestion.chunker import chunk_text
 from ingestion.embedder import embed_text_chunks, embed_images
 import chromadb
 from chromadb.config import Settings
-
+import time
 client = chromadb.PersistentClient(path="vector_store")
 collection = client.get_or_create_collection("research_knowledge_base")
 def run_ingestion_from_files(files):
@@ -23,11 +23,18 @@ def run_ingestion_from_files(files):
 
     # Add to Chroma
     for idx, emb in enumerate(all_embeddings):
+    # Create a unique ID: filename + index + timestamp
+        unique_id = f"{emb['source']}_{idx}_{int(time.time())}"
+        
         collection.add(
-            ids=[str(idx)],
+            ids=[unique_id], # Use the unique ID here
             embeddings=[emb["embedding"]],
-            metadatas=[{"source": emb["source"], "type": emb["type"]}],
-            documents=[emb.get("text", "")]  # images can be empty string
-        )
+            metadatas=[{
+                "source": emb["source"], 
+                "page": emb.get("page", "N/A"),
+                "type": emb["type"]
+            }],
+            documents=[emb.get("text", "")]
+    )
     print("Collection count:", collection.count())
     print("Ingestion complete.")
