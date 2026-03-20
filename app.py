@@ -1,3 +1,4 @@
+# app.py
 import streamlit as st
 st.set_page_config(page_title="🧠 RAG Assistant", layout="wide")
 from ingestion.ingest_pipeline import run_ingestion_from_files
@@ -6,81 +7,57 @@ from generation.generator import generate_answer
 from PIL import Image
 
 st.title("🧠 RAG Assistant")
-st.write("Upload documents (TXT, PDF, images) and ask questions based on them.")
 
-# -------------------------------
-# SESSION STATE
-# -------------------------------
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# -------------------------------
-# FILE UPLOAD
-# -------------------------------
-st.subheader("📂 Upload Documents")
-uploaded_files = st.file_uploader(
-    "Upload TXT, PDF, or image files",
-    type=["txt", "pdf", "png", "jpg", "jpeg"],
-    accept_multiple_files=True
-)
+# --- SIDEBAR FOR UPLOAD ---
+with st.sidebar:
+    st.subheader("📂 Knowledge Base")
+    uploaded_files = st.file_uploader(
+        "Upload TXT, PDF, or images",
+        type=["txt", "pdf", "png", "jpg", "jpeg"],
+        accept_multiple_files=True
+    )
+    if st.button("Process Documents"):
+        if uploaded_files:
+            with st.spinner("Analyzing..."):
+                run_ingestion_from_files(uploaded_files)
+            st.success("✅ Knowledge Base Updated!")
+        else:
+            st.warning("⚠️ Upload a file first.")
 
-if st.button("Process Documents"):
-    if uploaded_files:
-        run_ingestion_from_files(uploaded_files)
-        st.success("✅ Documents processed and stored!")
-    else:
-        st.warning("⚠️ Please upload at least one file.")
-
-# -------------------------------
-# QUESTION INPUT
-# -------------------------------
-st.subheader("❓ Ask Questions")
-query = st.text_input("Ask a question:")
+# --- MAIN CHAT INTERFACE ---
+query = st.text_input("💬 Ask about your research:", placeholder="e.g., What are the research questions?")
 
 if st.button("Submit") and query:
-
-    # Retrieve relevant chunks from Chroma
     results = retrieve(query)
-    st.write(f"Debug: Found {len(results['documents'][0])} matching chunks.") 
-    docs = results["documents"][0]
-    metadatas = results["metadatas"][0]
+    docs = results.get("documents", [[]])[0]
+    metadatas = results.get("metadatas", [[]])[0]
 
-    # Generate answer using retrieved context and chat history
     if not docs or docs == ['']:
-        answer = "I don’t have enough information in my knowledge base."
+        answer = "I couldn't find relevant information in the uploaded documents."
         sources = []
     else:
         answer = generate_answer(query, docs, st.session_state.history)
-        sources = [m.get("source") for m in metadatas]
+        sources = [f"{m.get('source')} (Page {m.get('page')})" for m in metadatas]
 
-    # Append to memory
-    st.session_state.history.append({
-        "question": query,
-        "answer": answer,
-        "sources": sources
-    })
+    st.session_state.history.append({"question": query, "answer": answer, "sources": sources})
 
-# -------------------------------
-# DISPLAY CHAT HISTORY
-# -------------------------------
-st.subheader("💬 Chat History")
+    # DEBUG EXPANDER - Only shows up when there is a result
+    with st.expander("🔍 Raw Context (What the AI is reading)"):
+        for i, content in enumerate(docs):
+            st.info(f"**Chunk {i+1} Metadata:** {metadatas[i]}")
+            st.code(content)
+
+# --- DISPLAY HISTORY ---
 for chat in reversed(st.session_state.history):
-    st.markdown(f"**🧑 Question:** {chat['question']}")
-    st.markdown(f"**🤖 Answer:** {chat['answer']}")
-
-    if chat["sources"]:
-        st.markdown("**📚 Sources:**")
-        for src in chat["sources"]:
-            # Show images inline if available
-            if src.lower().endswith((".png", ".jpg", ".jpeg")):
-                try:
-                    img = Image.open(src)
-                    st.image(img, caption=src, use_column_width=True)
-                except:
-                    st.markdown(f"- {src} (image not loaded)")
-            else:
-                st.markdown(f"- {src}")
-    st.markdown("---")
+    with st.chat_message("user"):
+        st.write(chat["question"])
+    with st.chat_message("assistant"):
+        st.write(chat["answer"])
+        if chat["sources"]:
+            st.caption(f"📚 Sources: {', '.join(list(set(chat['sources'])))}")
 
 # -------------------------------
 # CLEAR HISTORY
@@ -90,8 +67,3 @@ if st.button("Clear History"):
     st.success("Chat history cleared!")
 
 
-# to see the actual content being fed to the AI
-with st.expander("🔍 Raw Context (What the AI sees)"):
-    for i, content in enumerate(docs):
-        st.write(f"**Chunk {i+1}:**")
-        st.code(content)

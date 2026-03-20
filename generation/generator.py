@@ -9,8 +9,7 @@ def generate_answer(query, docs, history):
         history_text += f"User: {chat['question']}\nAssistant: {chat['answer']}\n"
 
     prompt = f"""
-You are a helpful AI assistant.
-
+ou are an expert academic assistant. Analyze the provided context thoroughly.
 Use the conversation history AND the provided context to answer the question.
 
 If the answer is not in the context, say:
