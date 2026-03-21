@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 st.set_page_config(page_title="🧠 RAG Assistant", layout="wide")
 from ingestion.ingest_pipeline import run_ingestion_from_files
@@ -6,7 +5,7 @@ from retrieval.retriever import retrieve
 from generation.generator import generate_answer
 from PIL import Image
 
-st.title("🧠 RAG Assistant")
+st.title("RAG Assistant")
 
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -28,7 +27,7 @@ with st.sidebar:
             st.warning("⚠️ Upload a file first.")
 
 # --- MAIN CHAT INTERFACE ---
-query = st.text_input("💬 Ask about your research:", placeholder="e.g., What are the research questions?")
+query = st.text_input("Ask anything based on the resources:", placeholder="e.g., What are the research questions?")
 
 if st.button("Submit") and query:
     results = retrieve(query)

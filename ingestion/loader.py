@@ -11,7 +11,7 @@ def load_documents_from_files(files: List):
         file.seek(0) 
         content = file.read()
         
-        # --- PDF BRANCH (Now with Page Tracking) ---
+        # --- PDF BRANCH  Page Tracking
         if filename.lower().endswith(".pdf"):
             pdf_reader = pypdf.PdfReader(io.BytesIO(content))
             
@@ -23,7 +23,7 @@ def load_documents_from_files(files: List):
                     documents.append({
                         "text": page_text, 
                         "source": filename, 
-                        "page": page_num + 1, # Humans count from 1
+                        "page": page_num + 1, 
                         "type": "text"
                     })
             

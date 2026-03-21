@@ -1,5 +1,3 @@
-# retrieval/retriever.py
-
 import chromadb
 import numpy as np
 import torch
@@ -14,9 +12,7 @@ model, preprocess, device = load_clip_model()
 client = chromadb.PersistentClient(path="vector_store")
 collection = client.get_or_create_collection("research_knowledge_base")
 
-def retrieve(query, top_k=3):
-
-    # tokenize query correctly
+def retrieve(query, top_k=5):
     tokens = open_clip.tokenize([query]).to(device)
 
     with torch.no_grad():
@@ -27,7 +23,9 @@ def retrieve(query, top_k=3):
 
     results = collection.query(
         query_embeddings=[query_embedding.tolist()],
-        n_results= 10
+        n_results=top_k, 
+        # Ensure we get documents AND metadatas (source/page)
+        include=["documents", "metadatas", "distances"] 
     )
 
     return results
